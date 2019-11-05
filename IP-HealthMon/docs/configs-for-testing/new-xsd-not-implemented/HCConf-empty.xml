@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:Connectors xmlns:ns0="http://healthcheck.infra.daimler.com/configuration" xmlns:ns2="http://healthcheck.infra.daimler.com/connectors" xmlns:ns3="http://healthcheck.infra.daimler.com/response" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://healthcheck.infra.daimler.com/configuration HealthCheckConfiguration.xsd ">
+  <ns2:DbConnectors/>
+  <ns2:HTTPConnectors/>
+  <ns2:JKSConnectors/>
+  <ns2:MQConnectors/>
+</ns0:Connectors>

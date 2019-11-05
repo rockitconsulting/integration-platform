@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HealthCheckResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="HealthCheckConfiguration.xsd">
+		<ResponseTimestamp>2018-03-16T14:13:57.734+01:00</ResponseTimestamp>
+		<Connectors>
+			<HTTPConnectors>
+				<HTTPConnector>
+					<Id>http1</Id>
+					<Status>OK</Status>
+				</HTTPConnector>
+				<HTTPConnector>
+					<Id>http2</Id>
+					<Status>NOK</Status>
+					<Error>Service not available</Error>
+				</HTTPConnector>
+			</HTTPConnectors>
+			<DbConnectors>
+				<DbConnector>
+					<Id>mbvm1</Id>
+					<Status>OK</Status>
+				</DbConnector>
+				<DbConnector>
+					<Id>mbvm2</Id>
+					<Status>NOK</Status>
+					<Error>SQL172762...</Error>
+				</DbConnector>
+			</DbConnectors>
+
+			<MQConnectors>
+				<MQConnector>
+					<Id>Q1</Id>
+					<Status>OK</Status>
+				</MQConnector>
+				<MQConnector>
+					<Id>Q2</Id>
+					<Status>NOK</Status>
+					<Error>MQ234...</Error>
+				</MQConnector>
+
+			</MQConnectors>
+
+		</Connectors>
+</HealthCheckResponse>

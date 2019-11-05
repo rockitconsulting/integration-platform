@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Connectors xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="HealthCheckConfiguration.xsd">
+	<HTTPConnectors>
+		<HTTPConnector>
+			<Id>http1</Id>
+			<RequestURL>http://localhost:8040/test/mock1</RequestURL>
+			<RequestLine>
+				<Method>GET</Method>
+			</RequestLine>
+		</HTTPConnector>
+		<HTTPConnector>
+			<Id>http2</Id>
+			<RequestURL>http://localhost:8040/test/mock2</RequestURL>
+		</HTTPConnector>
+	</HTTPConnectors>
+	<DbConnectors>
+		<DbConnector>
+			<Id>mbvm1</Id>
+			<ODBCDatasource>MBVM01</ODBCDatasource>
+			<DBSchema>MBVM01</DBSchema>
+			<DBTable>MBVM001_FZB_MAPPING_CONFIG</DBTable>
+		</DbConnector>
+		<DbConnector>
+			<Id>mbvm2</Id>
+			<ODBCDatasource>MBVXAI01</ODBCDatasource>
+			<DBSchema>CRM</DBSchema>
+			<DBTable>ABBATCH</DBTable>
+		</DbConnector>
+	</DbConnectors>
+
+	<MQConnectors>
+		<MQConnector>
+			<Id>Q1</Id>
+			<QueueName>IAP.EAI_SMPL.U.EJBACT.ERR</QueueName>
+		</MQConnector>
+		<MQConnector>
+			<Id>Q2</Id>
+			<QueueName>IAP.EAI_SMPL.U.EJBACT.REQ</QueueName>
+		</MQConnector>
+
+	</MQConnectors>
+
+</Connectors>

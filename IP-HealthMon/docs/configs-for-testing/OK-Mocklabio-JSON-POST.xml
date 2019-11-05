@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Connectors xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="HealthCheckConfiguration.xsd">
+	<HTTPConnectors>
+		<HTTPConnector>
+			<Id>mocklabioJSONAPI</Id>
+			<HTTPRequestHeader>
+				<Content-Type>text/plain</Content-Type>
+			</HTTPRequestHeader>
+			<RequestURL>http://w4z69.mocklab.io/json</RequestURL>
+			<RequestLine>
+				<Method>POST</Method>
+			</RequestLine>
+			<body>
+				<jsonrequest><![CDATA[{
+  "id": 12345,
+  "value": "abc-def-ghi"
+}]]></jsonrequest>
+			</body>
+
+		</HTTPConnector>		
+
+	</HTTPConnectors>
+
+		<DbConnectors>
+		</DbConnectors>
+		
+		<MQConnectors>		
+		</MQConnectors>	
+		
+</Connectors>
