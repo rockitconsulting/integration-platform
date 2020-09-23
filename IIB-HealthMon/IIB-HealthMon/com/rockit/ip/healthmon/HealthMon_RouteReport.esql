@@ -8,53 +8,57 @@ CREATE COMPUTE MODULE HealthMon_RouteReport
 
 		DECLARE refEnvResponse REFERENCE TO Environment.Variables.Config.XMLNSC.Connectors.*[1];
 
-		CREATE FIELD OutputRoot.JSON.Data;		
-
+		CREATE FIELD OutputRoot.JSON.Data;
+		
+		CREATE LASTCHILD OF Environment.Variables.Config DOMAIN('JSON');
+		CREATE LASTCHILD OF Environment.Variables.Config.JSON NAME 'Data';
+		
+		DECLARE refEnvJson REFERENCE TO Environment.Variables.Config.JSON.Data;	
 
 		WHILE LASTMOVE(refEnvResponse) DO
 
-			CREATE LASTCHILD OF OutputRoot.JSON.Data TYPE Name NAME 'connector'; 
+			CREATE LASTCHILD OF refEnvJson TYPE Name NAME 'connector'; 
 			IF (FIELDNAME(refEnvResponse.*[1]) = 'db')THEN
-				CREATE FIELD OutputRoot.JSON.Data.connector[<].db;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].db TYPE NameValue NAME 'Id' VALUE refEnvResponse.db.Id;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].db TYPE NameValue NAME 'Status' VALUE refEnvResponse.db.Status;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].db TYPE NameValue NAME 'StatusDetailed' VALUE refEnvResponse.db.StatusDetailed;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].db TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
+				CREATE FIELD refEnvJson.connector[<].db;
+				CREATE LASTCHILD OF refEnvJson.connector[<].db TYPE NameValue NAME 'Id' VALUE refEnvResponse.db.Id;
+				CREATE LASTCHILD OF refEnvJson.connector[<].db TYPE NameValue NAME 'Status' VALUE refEnvResponse.db.Status;
+				CREATE LASTCHILD OF refEnvJson.connector[<].db TYPE NameValue NAME 'StatusDetailed' VALUE refEnvResponse.db.StatusDetailed;
+				CREATE LASTCHILD OF refEnvJson.connector[<].db TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
 			END IF;
 
 			IF (FIELDNAME(refEnvResponse.*[1]) = 'mq')THEN
-				CREATE FIELD OutputRoot.JSON.Data.connector[<].mq;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].mq TYPE NameValue NAME 'Id' VALUE refEnvResponse.mq.Id;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].mq TYPE NameValue NAME 'Status' VALUE refEnvResponse.mq.Status;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].mq TYPE NameValue NAME 'StatusDetailed' VALUE refEnvResponse.mq.StatusDetailed;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].mq TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
+				CREATE FIELD refEnvJson.connector[<].mq;
+				CREATE LASTCHILD OF refEnvJson.connector[<].mq TYPE NameValue NAME 'Id' VALUE refEnvResponse.mq.Id;
+				CREATE LASTCHILD OF refEnvJson.connector[<].mq TYPE NameValue NAME 'Status' VALUE refEnvResponse.mq.Status;
+				CREATE LASTCHILD OF refEnvJson.connector[<].mq TYPE NameValue NAME 'StatusDetailed' VALUE refEnvResponse.mq.StatusDetailed;
+				CREATE LASTCHILD OF refEnvJson.connector[<].mq TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
 			END IF;
 
 			IF (FIELDNAME(refEnvResponse.*[1]) = 'http')THEN
-				CREATE FIELD OutputRoot.JSON.Data.connector[<].http;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].http TYPE NameValue NAME 'Id' VALUE refEnvResponse.http.Id;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].http TYPE NameValue NAME 'Status' VALUE refEnvResponse.http.Status;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].http TYPE NameValue NAME 'StatusDetailed' VALUE refEnvResponse.http.StatusDetailed;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].http TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
+				CREATE FIELD refEnvJson.connector[<].http;
+				CREATE LASTCHILD OF refEnvJson.connector[<].http TYPE NameValue NAME 'Id' VALUE refEnvResponse.http.Id;
+				CREATE LASTCHILD OF refEnvJson.connector[<].http TYPE NameValue NAME 'Status' VALUE refEnvResponse.http.Status;
+				CREATE LASTCHILD OF refEnvJson.connector[<].http TYPE NameValue NAME 'StatusDetailed' VALUE refEnvResponse.http.StatusDetailed;
+				CREATE LASTCHILD OF refEnvJson.connector[<].http TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
 			END IF;
 
 			IF (FIELDNAME(refEnvResponse.*[1]) = 'jks')THEN
-				CREATE FIELD OutputRoot.JSON.Data.connector[<].jks;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks TYPE NameValue NAME 'Id' VALUE refEnvResponse.jks.Id;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks TYPE NameValue NAME 'Status' VALUE refEnvResponse.jks.Status;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks TYPE NameValue NAME 'StatusDetailed' VALUE refEnvResponse.jks.StatusDetailed;
-				CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
+				CREATE FIELD refEnvJson.connector[<].jks;
+				CREATE LASTCHILD OF refEnvJson.connector[<].jks TYPE NameValue NAME 'Id' VALUE refEnvResponse.jks.Id;
+				CREATE LASTCHILD OF refEnvJson.connector[<].jks TYPE NameValue NAME 'Status' VALUE refEnvResponse.jks.Status;
+				CREATE LASTCHILD OF refEnvJson.connector[<].jks TYPE NameValue NAME 'StatusDetailed' VALUE refEnvResponse.jks.StatusDetailed;
+				CREATE LASTCHILD OF refEnvJson.connector[<].jks TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
 				IF refEnvResponse.jks.Status = 'OK' THEN
 					DECLARE refEnvJKSCerts REFERENCE TO refEnvResponse.jks.Certificates.Certificate;
 					WHILE LASTMOVE (refEnvJKSCerts) DO
-						CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks TYPE Name NAME 'certificate';
-						CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks.certificate[<] TYPE NameValue NAME 'Id' VALUE refEnvResponse.Id;
-						CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks.certificate[<] TYPE NameValue NAME 'Status' VALUE refEnvJKSCerts.CertificateStatus;
-						CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks.certificate[<] TYPE NameValue NAME 'Name' VALUE refEnvJKSCerts.Alias;
-						CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks.certificate[<] TYPE NameValue NAME 'SubjectDN' VALUE refEnvJKSCerts.SubjectDN;
-						CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks.certificate[<] TYPE NameValue NAME 'Valif from' VALUE refEnvJKSCerts.valid_from;
-						CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks.certificate[<] TYPE NameValue NAME 'Valid to' VALUE refEnvJKSCerts.valid_to;
-						CREATE LASTCHILD OF OutputRoot.JSON.Data.connector[<].jks.certificate[<] TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
+						CREATE LASTCHILD OF refEnvJson.connector[<].jks TYPE Name NAME 'certificate';
+						CREATE LASTCHILD OF refEnvJson.connector[<].jks.certificate[<] TYPE NameValue NAME 'Id' VALUE refEnvResponse.Id;
+						CREATE LASTCHILD OF refEnvJson.connector[<].jks.certificate[<] TYPE NameValue NAME 'Status' VALUE refEnvJKSCerts.CertificateStatus;
+						CREATE LASTCHILD OF refEnvJson.connector[<].jks.certificate[<] TYPE NameValue NAME 'Name' VALUE refEnvJKSCerts.Alias;
+						CREATE LASTCHILD OF refEnvJson.connector[<].jks.certificate[<] TYPE NameValue NAME 'SubjectDN' VALUE refEnvJKSCerts.SubjectDN;
+						CREATE LASTCHILD OF refEnvJson.connector[<].jks.certificate[<] TYPE NameValue NAME 'Valif from' VALUE refEnvJKSCerts.valid_from;
+						CREATE LASTCHILD OF refEnvJson.connector[<].jks.certificate[<] TYPE NameValue NAME 'Valid to' VALUE refEnvJKSCerts.valid_to;
+						CREATE LASTCHILD OF refEnvJson.connector[<].jks.certificate[<] TYPE NameValue NAME 'Timestamp' VALUE Environment.Variables.Config.XMLNSC.ResponseTimestamp;
 						MOVE refEnvJKSCerts NEXTSIBLING REPEAT TYPE NAME;
 					END WHILE;
 				END IF;
@@ -64,19 +68,20 @@ CREATE COMPUTE MODULE HealthMon_RouteReport
 			MOVE refEnvResponse NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
 		
-		DECLARE refInputReport REFERENCE TO InputRoot.XMLNSC.healthmon.reports; 
+		DECLARE refInputReport REFERENCE TO InputRoot.XMLNSC.healthmon.reports.*[1]; 
 		
 		WHILE LASTMOVE(refInputReport) DO
 ------			
-			IF (FIELDNAME(refInputReport.report.[<])= 'mq')THEN
+			IF (FIELDNAME(refInputReport.[<])= 'mq')THEN
 				SET OutputLocalEnvironment.Destination.MQ.DestinationData[1].queueName = FIELDVALUE(refInputReport.mq.property.(XMLNSC.Attribute)value);
 				IF (FIELDVALUE(refInputReport.report.(XMLNSC.Attribute)level) = 'All') THEN
+					SET OutputRoot.JSON.Data = refEnvJson;
 					PROPAGATE TO TERMINAL 'out';
 				END IF;	
 			END IF;
 ------			
-			IF (FIELDNAME(refInputReport.report.[<])= 'file')THEN
-				DECLARE refFileReport REFERENCE TO refInputReport.report.file.property[1];
+			IF (FIELDNAME(refInputReport.[<])= 'file')THEN
+				DECLARE refFileReport REFERENCE TO refInputReport.file.property[1];
 				WHILE LASTMOVE(refFileReport) DO
 						CASE 
 	  						WHEN FIELDVALUE(refFileReport.(XMLNSC.Attribute)name) = 'Directory' THEN
@@ -87,13 +92,14 @@ CREATE COMPUTE MODULE HealthMon_RouteReport
 					MOVE refFileReport NEXTSIBLING REPEAT TYPE NAME;
 				END WHILE;
 				
-				IF (FIELDVALUE(refInputReport.report.(XMLNSC.Attribute)level) = 'All') THEN
+				IF (FIELDVALUE(refInputReport.(XMLNSC.Attribute)level) = 'All') THEN
+					SET OutputRoot.JSON.Data = refEnvJson;
 					PROPAGATE TO TERMINAL 'out1';	
 				END IF;
 			END IF;
 ------			
-			IF (FIELDNAME(refInputReport.report.[<])= 'mail')THEN
-				DECLARE refMailReport REFERENCE TO refInputReport.report.mail.property[1];
+			IF (FIELDNAME(refInputReport.[<])= 'mail')THEN
+				DECLARE refMailReport REFERENCE TO refInputReport.mail.property[1];
 				WHILE LASTMOVE(refMailReport) DO
 						CASE 
 	  						WHEN FIELDVALUE(refMailReport.(XMLNSC.Attribute)name) = 'SMTPServer' THEN
@@ -116,13 +122,14 @@ CREATE COMPUTE MODULE HealthMon_RouteReport
 				SET OutputLocalEnvironment.Destination.Email.Attachment.Content = OutputRoot.JSON.Data;
 				SET OutputLocalEnvironment.Destination.Email.Attachment.ContentType = 'application/pdf';
 				SET OutputRoot.BLOB.BLOB = CAST('This is the new text for the body of the email.' AS BLOB CCSID 1208);
-				IF (FIELDVALUE(refInputReport.report.(XMLNSC.Attribute)level) = 'All') THEN
+				IF (FIELDVALUE(refInputReport.(XMLNSC.Attribute)level) = 'All') THEN
+					SET OutputRoot.JSON.Data = refEnvJson;
 					PROPAGATE TO TERMINAL 'out2';
 				END IF;
 			END IF;
 ------			
-			IF (FIELDNAME(refInputReport.report.[<])= 'jms')THEN
-				DECLARE refJMSReport REFERENCE TO refInputReport.report.jms.property[1];
+			IF (FIELDNAME(refInputReport.[<])= 'jms')THEN
+				DECLARE refJMSReport REFERENCE TO refInputReport.jms.property[1];
 				DECLARE i INTEGER  1;
 				WHILE LASTMOVE(refJMSReport) DO
 					
@@ -131,13 +138,14 @@ CREATE COMPUTE MODULE HealthMon_RouteReport
 					SET i = i+1;
 					MOVE refJMSReport NEXTSIBLING REPEAT TYPE NAME;
 				END WHILE;
-				IF (FIELDVALUE(refInputReport.report.(XMLNSC.Attribute)level) = 'All') THEN
+				IF (FIELDVALUE(refInputReport.(XMLNSC.Attribute)level) = 'All') THEN
+					SET OutputRoot.JSON.Data = refEnvJson;
 					PROPAGATE TO TERMINAL 'out3';
 				END IF;
 			END IF;
 ------			
---			IF (FIELDNAME(refInputReport.report.[<])= 'kafka')THEN
---				DECLARE refKafkaReport REFERENCE TO refInputReport.report.kafka.property[1];
+--			IF (FIELDNAME(refInputReport.[<])= 'kafka')THEN
+--				DECLARE refKafkaReport REFERENCE TO refInputReport.kafka.property[1];
 --				WHILE LASTMOVE(refKafkaReport) DO
 --						CASE 
 --	  						WHEN FIELDVALUE(refKafkaReport.(XMLNSC.Attribute)name) = 'Partition' THEN
@@ -153,7 +161,8 @@ CREATE COMPUTE MODULE HealthMon_RouteReport
 --						END CASE;
 --					MOVE refKafkaReport NEXTSIBLING REPEAT TYPE NAME;
 --				END WHILE;
---				IF (FIELDVALUE(refInputReport.report.(XMLNSC.Attribute)level) = 'All') THEN
+--				IF (FIELDVALUE(refInputReport.(XMLNSC.Attribute)level) = 'All') THEN
+--					SET OutputRoot.JSON.Data = refEnvJson;
 --					PROPAGATE TO TERMINAL 'out4';
 --				END IF;
 --			END IF;	

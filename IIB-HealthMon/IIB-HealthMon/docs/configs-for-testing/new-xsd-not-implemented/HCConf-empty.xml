@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:Connectors xmlns:ns0="" xmlns:ns2="" xmlns:ns3="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="">
+  <ns2:DbConnectors/>
+  <ns2:HTTPConnectors/>
+  <ns2:JKSConnectors/>
+  <ns2:MQConnectors/>
+</ns0:Connectors>

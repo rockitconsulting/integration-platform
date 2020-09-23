@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<healthmon xmlns:n1="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://com.rockit/healthmon" n1:noNamespaceSchemaLocation="C:\rockit\projects\rockitsvn_transition\IIB-HealthMon\IIB-HealthMon\healthmon.xsd">
+	<connectors>
+		<connector>
+			<db targetNamespace="http://com.rockit/healthmon/connector/db">
+				<property name="Id" value=""/>
+				<property name="ODBCDatasource" value=""/>
+				<property name="DBSchema" value=""/>
+				<property name="DBTable" value=""/>
+			</db>
+		</connector>
+		<connector>
+			<http xmlns:http="http://com.rockit/healthmon/connector/http">
+				<property name="Id" value=""/>
+				<property name="LbStatus" value=""/>
+				<property name="HTTPRequestHeader.Authorization" value=""/>
+				<property name="HTTPRequestHeader.Content-Type" value="text/xml"/>
+				<property name="RequestURL" value=""/>
+				<property name="RequestLine.Method" value="POST"/>
+				<property name="SSLProtocol" value="SSL_TLSv2"/>
+				<requesttemplate><![CDATA[<body></body>]]></requesttemplate>
+			</http>
+		</connector>
+		<connector>
+			<http xmlns:http="http://com.rockit/healthmon/connector/http">
+				<property name="Id" value=""/>
+				<property name="LbStatus" value=""/>
+				<property name="HTTPRequestHeader.Authorization" value=""/>
+				<property name="HTTPRequestHeader.Content-Type" value="text/xml"/>
+				<property name="RequestURL" value=""/>
+				<property name="RequestLine.Method" value="GET"/>
+				<property name="SSLProtocol" value=""/>
+				<requesttemplate><![CDATA[<body></body>]]></requesttemplate>
+			</http>
+		</connector>
+		<connector>
+			<jks targetNamespace="http://com.rockit/healthmon/connector/jks">
+				<property name="Id" value=""/>
+				<property name="TrustStoreFileName" value=""/>
+				<property name="TrustStorePwd" value=""/>
+			</jks>
+		</connector>
+		<connector>
+			<mq targetNamespace="http://com.rockit/healthmon/connector/mq">
+				<property name="Id" value=""/>
+				<property name="QueueName" value=""/>
+			</mq>
+		</connector>
+		<connector>
+			<jks targetNamespace="http://com.rockit/healthmon/connector/jks">
+				<property name="Id" value=""/>
+				<property name="TrustStoreFileName" value=""/>
+				<property name="TrustStorePwd" value=""/>
+			</jks>
+		</connector>
+	</connectors>
+	<reports>
+	
+		<report level="All" targetNamespace="http://com.rockit/healthmon/report">
+			<mq targetNamespace="http://com.rockit/healthmon/connector/mq">
+				<property name="QueueName" value=""/>
+			</mq>
+		</report>
+		
+		<report level="All" targetNamespace="http://com.rockit/healthmon/report">
+			<mail targetNamespace="http://com.rockit/healthmon/connector/mail">
+				<property name="SMTPServer" value=""/>
+				<property name="Sender" value=""/>
+				<property name="Receiver" value=""/>
+				<property name="CC" value=""/> 	
+				<property name="SecurityIdentity" value=""/> 
+				<property name="BodyContentType" value="text/html"/>
+				<property name="AttachmentContentName" value=""/>
+			</mail>
+		</report>
+	
+	
+		<report level="All" targetNamespace="http://com.rockit/healthmon/report">
+			<file targetNamespace="http://com.rockit/healthmon/connector/file">
+				<property name="Directory" value=""/>
+				<property name="FileName" value=""/>
+			</file>
+		</report>
+		
+		<report level="All" targetNamespace="http://com.rockit/healthmon/report">
+			<jms targetNamespace="http://com.rockit/healthmon/connector/jms">
+				<property name="qName" value=""/>
+				<property name="qName" value=""/>
+				<property name="qName" value=""/>
+				<property name="qName" value=""/>
+			</jms>
+		</report>
+		
+	<!--	
+		<report level="All" targetNamespace="http://com.rockit/healthmon/report">
+			<kafka targetNamespace="http://com.rockit/healthmon/connector/kafka">
+				<property name="kafkaConfigProperty" value=""/>
+			</kafka>
+		</report>
+	-->	
+	</reports>
+</healthmon>
