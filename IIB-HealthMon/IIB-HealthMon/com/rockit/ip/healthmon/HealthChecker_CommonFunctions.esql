@@ -1,0 +1,75 @@
+BROKER SCHEMA com.rockit.ip.healthmon
+
+-- $MQSI Author=Eduard Gohr, rockIT.consulting GmbH MQSI$
+
+CREATE PROCEDURE setConnectorStatus(IN connectorType CHARACTER, IN Id CHARACTER, IN Status CHARACTER, IN statusDetailed CHARACTER, INOUT refEnv REFERENCE)
+BEGIN
+	
+			SET refEnv.Id = Id;
+			SET refEnv.Status = Status;
+			SET refEnv.StatusDetailed = statusDetailed;
+
+END;
+
+CREATE PROCEDURE setJKSConnectorStatus(IN connectorType CHARACTER, IN Id CHARACTER, IN Status CHARACTER, IN statusDetailed CHARACTER, INOUT refEnv REFERENCE, INOUT refResultTree REFERENCE)
+BEGIN
+	
+			SET refEnv.Id = Id;
+			SET refEnv.Status = Status;
+			SET refEnv.StatusDetailed = statusDetailed;
+			IF (Status = 'OK') THEN
+				CREATE LASTCHILD OF refEnv Domain('XMLNS') NAME 'Certificates'
+				VALUE '';
+				SET refEnv.Certificates = refResultTree;
+			END IF;
+			
+
+END;
+
+CREATE FUNCTION createErrorMsgFromExceptionList(IN exceptionListRef REFERENCE) RETURNS CHARACTER
+BEGIN
+	DECLARE cErrorMsg CHARACTER ' ';
+
+	WHILE LASTMOVE(exceptionListRef) DO
+		WHILE LASTMOVE(exceptionListRef) DO
+			IF FIELDTYPE(exceptionListRef) = Name
+				OR FIELDTYPE(exceptionListRef) = XMLNSC.Folder
+				THEN
+				SET cErrorMsg = cErrorMsg||FIELDNAME(exceptionListRef)||' - ';
+				MOVE exceptionListRef FIRSTCHILD;
+			ELSE
+				SET cErrorMsg = cErrorMsg ||FIELDNAME(exceptionListRef)||': '
+				||CAST(FIELDVALUE(exceptionListRef) AS CHARACTER)||' - ';
+				MOVE exceptionListRef NEXTSIBLING;
+			END IF;
+		END WHILE;
+		MOVE exceptionListRef PARENT;
+		IF LASTMOVE(exceptionListRef) THEN
+			MOVE exceptionListRef NEXTSIBLING;
+		END IF;
+	END WHILE;
+
+	RETURN TRANSLATE(LTRIM(cErrorMsg),'<>;&"''');
+END;
+
+CREATE PROCEDURE lastErrMsgComplete(IN exceptionListRef REFERENCE, INOUT envRef REFERENCE )
+BEGIN
+	DECLARE inputExceptionListRef REFERENCE TO exceptionListRef.*[1];
+	DECLARE msgText CHARACTER;
+	DECLARE number CHARACTER;
+
+	WHILE LASTMOVE(inputExceptionListRef) DO
+		IF inputExceptionListRef.Number IS NOT NULL THEN
+			SET msgText = COALESCE(inputExceptionListRef.Text, ' ');
+			SET number = inputExceptionListRef.Number;
+			FOR cursor AS inputExceptionListRef.Insert[] DO
+				SET msgText = msgText || ' - ' || COALESCE(cursor.Text,' ');
+			END FOR;
+		END IF;
+		MOVE inputExceptionListRef LASTCHILD;
+	END WHILE;
+
+	SET envRef.error.code = number;
+	SET envRef.error.message = msgText;
+
+END;

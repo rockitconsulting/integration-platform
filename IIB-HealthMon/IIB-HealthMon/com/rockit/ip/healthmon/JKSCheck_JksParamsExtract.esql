@@ -1,0 +1,61 @@
+BROKER SCHEMA com.rockit.ip.healthmon
+PATH com.rockit.ip.healthmon, com.rockit.ip.logging;
+CREATE COMPUTE MODULE JKSCheck_JksParamsExtract
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CREATE LASTCHILD OF  Environment.Variables.Config.XMLNSC.Connectors.Connector[<] NAME 'jks';
+		DECLARE refConnector REFERENCE TO InputRoot.XMLNSC.Connectors;
+		DECLARE refEnv REFERENCE TO Environment.Variables.Config.XMLNSC.Connectors.Connector[<].jks;
+		DECLARE Id CHARACTER;
+		DECLARE TRUST_STORE_FILE CHARACTER;
+		DECLARE TRUST_STORE_PWD CHARACTER;
+
+		SET OutputRoot.Properties = InputProperties;
+		DECLARE resultTree ROW;
+		DECLARE resultErrorTree ROW;
+		DECLARE refResultTree REFERENCE TO resultTree;
+		DECLARE refResultErrorTree REFERENCE TO resultErrorTree;
+		DECLARE inputRootRef REFERENCE TO InputRoot;
+
+		WHILE LASTMOVE(refConnector) DO
+			DECLARE statusDetailed CHARACTER '';
+			DECLARE status CHARACTER 'OK';
+			BEGIN
+				DECLARE CONTINUE HANDLER FOR SQLSTATE LIKE'%'
+				BEGIN
+					SET status = 'NOK';
+					SET statusDetailed = COALESCE(NULLIF(TRIM(refResultErrorTree.error.errorMessage),''),'No error message text');
+				END;
+
+				DECLARE refProperties REFERENCE TO refConnector.jks.property[1];
+
+				WHILE LASTMOVE(refProperties) DO
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'Id' ) THEN
+						SET Id = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'TrustStoreFileName' ) THEN
+						SET TRUST_STORE_FILE = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'TrustStorePwd' ) THEN
+						SET TRUST_STORE_PWD = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					MOVE refProperties NEXTSIBLING REPEAT NAME;
+				END WHILE;
+
+				CALL getTrustStoreInfo(refResultTree, refResultErrorTree, TRUST_STORE_FILE, TRUST_STORE_PWD);
+
+				CALL setJKSConnectorStatus('JKSConnector', Id, status, statusDetailed, refEnv, refResultTree);
+				MOVE refConnector NEXTSIBLING REPEAT TYPE NAME;
+			END;
+		END WHILE;
+		RETURN FALSE;
+	END;
+
+	CREATE PROCEDURE getTrustStoreInfo(INOUT refResultTree REFERENCE, INOUT refResultErrorTree REFERENCE, IN trustStoreFileName CHARACTER, IN trustStorPwd CHARACTER)
+	LANGUAGE JAVA
+	EXTERNAL NAME "com.rockit.ip.healthmon.JksCheck.getJksInfo";
+
+END MODULE;

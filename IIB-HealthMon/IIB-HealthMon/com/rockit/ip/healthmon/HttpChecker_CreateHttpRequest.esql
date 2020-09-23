@@ -1,0 +1,82 @@
+BROKER SCHEMA com.rockit.ip.healthmon
+PATH com.rockit.ip.healthmon, com.rockit.ip.logging;
+-- $MQSI Author=Eduard Gohr, rockIT.consulting GmbH MQSI$
+
+CREATE COMPUTE MODULE HttpChecker_CreateHttpRequest
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CREATE LASTCHILD OF  Environment.Variables.Config.XMLNSC.Connectors.Connector[<] NAME 'http';
+		DECLARE refConnector REFERENCE TO InputRoot.XMLNSC.Connectors;
+		DECLARE refEnv REFERENCE TO Environment.Variables.Config.XMLNSC.Connectors.Connector[<].http;
+		DECLARE Id CHARACTER;
+		DECLARE Body CHARACTER;
+
+		WHILE LASTMOVE(refConnector) DO
+			DECLARE statusDetailed CHARACTER '';
+			DECLARE status CHARACTER 'OK';
+			BEGIN
+				DECLARE CONTINUE HANDLER FOR SQLSTATE LIKE'%'
+				BEGIN
+					SET Environment.ReportFlag = 'false';
+					SET status = 'NOK';
+					SET statusDetailed = COALESCE(COALESCE(NULLIF(TRIM(SQLERRORTEXT),''),Environment.Variables.error.message),'No error message text');
+					SET Environment.Variables.error = NULL;
+				END;
+
+				DECLARE refProperties REFERENCE TO refConnector.http.property[1];
+
+				WHILE LASTMOVE(refProperties) DO
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'Id' ) THEN
+						SET Id = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'HTTPRequestHeader.Authorization' ) THEN
+						SET OutputRoot.HTTPRequestHeader.Authorization = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'HTTPRequestHeader.Content-Type' ) THEN
+						SET OutputRoot.HTTPRequestHeader.ContentType = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'RequestURL' ) THEN
+						SET OutputLocalEnvironment.Destination.HTTP.RequestURL = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'RequestLine.Method' ) THEN
+						SET OutputLocalEnvironment.Destination.HTTP.RequestLine.Method = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'SSLProtocol' ) THEN
+						SET OutputLocalEnvironment.Destination.HTTP.SSLProtocol = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					IF ( FIELDVALUE(refProperties.(XMLNSC.Attribute)name) = 'LbStatus' ) THEN
+						SET OutputLocalEnvironment.Destination.HTTP.LbStatus = FIELDVALUE(refProperties.(XMLNSC.Attribute)value);
+					END IF;
+
+					MOVE refProperties NEXTSIBLING REPEAT NAME;
+				END WHILE;
+
+				SET OutputRoot.Properties = InputProperties;
+
+				SET Body = refConnector.http.requesttemplate;
+
+				DECLARE inCCSID INT InputProperties.CodedCharSetId;
+				DECLARE inEncoding INT InputProperties.Encoding;
+				CREATE LASTCHILD OF Environment.Body DOMAIN('XMLNSC') PARSE( Body, inEncoding, inCCSID,'BLOB', 'XMLNSC');
+
+				IF(FIELDNAME(Environment.Body.XMLNSC[<].body.*) = 'xmlrequest') THEN
+				SET OutputRoot.XMLNSC = Environment.Body.XMLNSC[<].body.xmlrequest;
+			ELSEIF (FIELDNAME(Environment.Body.XMLNSC[<].body.*) = 'jsonrequest') THEN
+				CREATE LASTCHILD OF OutputRoot DOMAIN('JSON') PARSE( CAST(Environment.Body.XMLNSC[<].body.jsonrequest AS BLOB CCSID InputRoot.Properties.CodedCharSetId) );
+			END IF;
+			PROPAGATE;
+			CALL setConnectorStatus('HTTPConnector',Id, status, statusDetailed, refEnv);
+			MOVE refConnector NEXTSIBLING REPEAT TYPE NAME;
+		END;
+	END WHILE;
+
+	RETURN FALSE;
+END;
+
+END MODULE;
