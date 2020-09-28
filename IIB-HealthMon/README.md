@@ -5,6 +5,6 @@
 ## HealthMon-Monitoring
 ![HealthMon-Monitoring](https://raw.githubusercontent.com/rockitconsulting/integration-platform/master/IIB-HealthMon/IIB-HealthMon/docs/img/HealthMon-Monitoring.PNG?raw=true)
 
-![HealthMon-Monitoring-Description](https://github.com/rockitconsulting/integration-platform/tree/master/IIB-HealthMon/IIB-HealthMon/docs/img/HealthMon-Monitoring-Description.PNG?raw=true)
+![HealthMon-Monitoring-Description](https://raw.githubusercontent.com/rockitconsulting/integration-platform/master/IIB-HealthMon/IIB-HealthMon/docs/img/HealthMon-Monitoring-Description.PNG?raw=true)
 
 
