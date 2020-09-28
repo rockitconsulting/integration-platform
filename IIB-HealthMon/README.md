@@ -109,5 +109,5 @@ Monitor your IIB/ACE integration landscape, including availability of inbound an
 </healthmon>
 ```
 
-##HealthMon.msgflow
+## HealthMon.msgflow
 ![HealthMon](https://raw.githubusercontent.com/rockitconsulting/integration-platform/master/IIB-HealthMon/IIB-HealthMon/docs/img/HealthMon.PNG?raw=true)
