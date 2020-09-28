@@ -10,6 +10,7 @@ Monitor your IIB/ACE integration landscape, including availability of inbound an
 ![HealthMon-Monitoring-Description](https://raw.githubusercontent.com/rockitconsulting/integration-platform/master/IIB-HealthMon/IIB-HealthMon/docs/img/HealthMon-Monitoring-Description.PNG?raw=true)
 
 
+##connector configuration
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <healthmon xmlns:n1="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://com.rockit/healthmon" n1:noNamespaceSchemaLocation="C:\rockit\projects\rockitsvn_transition\IIB-HealthMon\IIB-HealthMon\healthmon.xsd">
