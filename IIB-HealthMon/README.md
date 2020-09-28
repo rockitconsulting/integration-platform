@@ -3,7 +3,7 @@
 # HealthMon - Keep Your Integration Monitored!
 
 ## HealthMon
-Monitor your IIB/ACE integration landscape, including availability of inbound and outbound business-APIs and infrastructure, using generic connector configuration.
+Monitor your IIB/ACE integration landscape, including availability of inbound and outbound business-APIs and infrastructure, using generic connector configuration. The different report types and alert threshold are supported. 
 
 ![HealthMon-Monitoring](https://raw.githubusercontent.com/rockitconsulting/integration-platform/master/IIB-HealthMon/IIB-HealthMon/docs/img/HealthMon-Monitoring.PNG?raw=true)
 
