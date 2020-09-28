@@ -1,5 +1,5 @@
 BROKER SCHEMA com.rockit.ip.healthmon
-PATH com.rockit.ip.healthmon, com.rockit.ip.logging;
+PATH com.rockit.ip.healthmon;
 CREATE COMPUTE MODULE JKSCheck_JksParamsExtract
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN

@@ -1,5 +1,5 @@
 BROKER SCHEMA com.rockit.ip.healthmon
-PATH com.rockit.ip.healthmon, com.rockit.ip.logging;
+PATH com.rockit.ip.healthmon;
 -- $MQSI Author=Eduard Gohr, rockIT.consulting GmbH MQSI$
 
 CREATE COMPUTE MODULE MQChecker_CreateMQRequest
