@@ -2,7 +2,7 @@
 
 # IIB-Scheduler
 
-The IBB-Scheduler application provides the functions of a cron pattern to be used.
+The IBB-Scheduler application provides the functions of a cron pattern.
 
 ## CronManager.msgflow
 
