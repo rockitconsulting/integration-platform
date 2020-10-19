@@ -1,0 +1,46 @@
+BROKER SCHEMA com.rockit.ip.scheduler
+
+DECLARE shns NAMESPACE 'http://rockit.com/scheduler';
+
+CREATE COMPUTE MODULE CronManager_CreateTriggerMessage
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.XMLNSC = InputRoot.XMLNSC;
+		
+		DECLARE schedulerRecordRef REFERENCE TO OutputRoot.XMLNSC.shns:schedulerMessage.schedulerRecord;		
+        WHILE LASTMOVE(schedulerRecordRef) DO
+        	IF (schedulerRecordRef.nextExecutionDate IS  NULL) THEN
+        		-- logging 00010 (TODO)
+        		 SET schedulerRecordRef.nextExecutionDate = cronNextExecution(schedulerRecordRef.cronPattern);
+--        		 CALL com.rockit.common.log.logInfo('00010', 'scheduler initialization ' || COALESCE(schedulerRecordRef.schedulerId,'') || ' | ' || COALESCE(schedulerRecordRef.cronPattern,'') || 
+--                        ' | ' ||  COALESCE(schedulerRecordRef.queueName,'') || ' | ' || COALESCE(schedulerRecordRef.nextExecutionDate,''));
+        	ELSE
+				DECLARE pattern CHARACTER 'yyyy-MM-dd HH:mm:ss';
+				DECLARE now TIMESTAMP CURRENT_TIMESTAMP;
+                DECLARE trigerExecTime TIMESTAMP CAST(schedulerRecordRef.nextExecutionDate AS TIMESTAMP FORMAT pattern);
+                
+                IF trigerExecTime <= now THEN
+   	               SET schedulerRecordRef.nextExecutionDate = cronNextExecution(schedulerRecordRef.cronPattern);
+   	               SET OutputLocalEnvironment.Destination.MQ.DestinationData.queueName = schedulerRecordRef.queueName;
+   	               -- logging 00020 (TODO)
+--        		 CALL com.rockit.common.log.logInfo('00020', 'scheduler fired ' || COALESCE(schedulerRecordRef.schedulerId,'') || ' | ' || COALESCE(schedulerRecordRef.cronPattern,'') || 
+--                        ' | ' ||  COALESCE(schedulerRecordRef.queueName,'') || ' | ' || COALESCE(schedulerRecordRef.nextExecutionDate,''));
+        		   SET schedulerRecordRef.nextExecutionDate = cronNextExecution(schedulerRecordRef.cronPattern);
+--        		 CALL com.rockit.common.log.logInfo('00030', 'scheduler next execution ' || COALESCE(schedulerRecordRef.schedulerId,'') || ' | ' || COALESCE(schedulerRecordRef.cronPattern,'') || 
+--                        ' | ' ||  COALESCE(schedulerRecordRef.queueName,'') || ' | ' || COALESCE(schedulerRecordRef.nextExecutionDate,''));
+   	               
+   	               PROPAGATE TO TERMINAL 'out' FINALIZE NONE DELETE NONE;
+                END IF;   
+	        END IF;
+        	
+			MOVE schedulerRecordRef NEXTSIBLING REPEAT TYPE NAME;
+        END WHILE;
+        
+        PROPAGATE TO TERMINAL 'out1' FINALIZE NONE DELETE NONE;
+		RETURN FALSE;
+	END;
+
+	CREATE PROCEDURE cronNextExecution (IN nextExecution CHARACTER) RETURNS CHARACTER LANGUAGE JAVA
+    	EXTERNAL NAME "com.rockit.ip.scheduler.CronUtil.nextExecution";
+
+END MODULE;

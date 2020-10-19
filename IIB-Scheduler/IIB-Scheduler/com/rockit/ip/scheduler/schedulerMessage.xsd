@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://rockit.com/scheduler">
+    <xsd:complexType name="schedulerRecordType">
+    	<xsd:sequence>
+    		<xsd:element name="schedulerId" type="xsd:string"
+    			minOccurs="1" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="brokerName" type="xsd:string"
+    			minOccurs="1" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="cronPattern" type="xsd:string"
+    			minOccurs="1" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="queueName" type="xsd:string"
+    			minOccurs="1" maxOccurs="1">
+    		</xsd:element>
+    		<!-- xsd:dateTime TIMESTAMP or GMTTIMESTAMP yyyy-MM-dd'T'HH:mm:ss.SSSZZZ -->
+    		<xsd:element name="nextExecutionDate" type="xsd:dateTime"></xsd:element>
+
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="schedulerMessageType">
+    	<xsd:sequence>
+    		<xsd:element xmlns="http://rockit.com/scheduler" name="schedulerRecord" type="schedulerRecordType" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element xmlns="http://rockit.com/scheduler" name="schedulerMessage" type="schedulerMessageType"></xsd:element>
+</xsd:schema>

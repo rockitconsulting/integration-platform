@@ -1,0 +1,67 @@
+
+/**
+* This function returns the exception list as string.
+*
+* @param exceptionListRef reference to exceptionList within a message
+*
+* @author W. Mueller Rockit Consulting
+*/
+CREATE FUNCTION createErrorMsgFromExceptionList(IN exceptionListRef REFERENCE) RETURNS CHARACTER
+BEGIN
+	DECLARE cErrorMsg CHARACTER ' ';
+
+	WHILE LASTMOVE(exceptionListRef) DO
+		WHILE LASTMOVE(exceptionListRef) DO
+			IF FIELDTYPE(exceptionListRef) = Name
+				OR FIELDTYPE(exceptionListRef) = XMLNSC.Folder
+				THEN
+				SET cErrorMsg = cErrorMsg||FIELDNAME(exceptionListRef)||' - ';
+				MOVE exceptionListRef FIRSTCHILD;
+			ELSE
+				SET cErrorMsg = cErrorMsg	||FIELDNAME(exceptionListRef)||': '
+											||CAST(FIELDVALUE(exceptionListRef) AS CHARACTER)||' - ';
+				MOVE exceptionListRef NEXTSIBLING;
+			END IF;
+		END WHILE;
+		MOVE exceptionListRef PARENT;
+		IF LASTMOVE(exceptionListRef) THEN
+			MOVE exceptionListRef NEXTSIBLING;
+		END IF;
+	END WHILE;
+
+	RETURN TRANSLATE(LTRIM(cErrorMsg),'<>;&"''');
+END;
+
+
+/**
+* This function returns the description of the last error message as string
+* including arguments or inserts.
+*
+* @param exceptionListRef reference to exceptionList within a message
+*
+* @author W. Mueller Rockit Consulting
+*/
+CREATE PROCEDURE lastErrMsgComplete(IN exceptionListRef REFERENCE, INOUT envRef REFERENCE )
+BEGIN
+	DECLARE inputExceptionListRef REFERENCE TO exceptionListRef.*[1];
+	DECLARE msgText CHARACTER;
+	DECLARE number  CHARACTER;
+	DECLARE severity CHARACTER;
+
+	WHILE LASTMOVE(inputExceptionListRef) DO
+		IF inputExceptionListRef.Number IS NOT NULL THEN
+			SET msgText = COALESCE(inputExceptionListRef.Text, ' ');
+			SET number  = inputExceptionListRef.Number;
+			SET severity = inputExceptionListRef.Severity;
+			FOR cursor AS inputExceptionListRef.Insert[] DO
+				SET msgText = msgText || ' - ' || COALESCE(cursor.Text,' ');
+			END FOR;
+		END IF;
+		MOVE inputExceptionListRef LASTCHILD;
+	END WHILE;
+	
+	SET envRef.error.code    = number;
+	SET envRef.error.message = msgText;
+	SET envRef.error.severity = severity;
+
+END;

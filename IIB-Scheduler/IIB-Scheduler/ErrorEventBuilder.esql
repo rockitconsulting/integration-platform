@@ -1,0 +1,49 @@
+CREATE COMPUTE MODULE ErrorEventBuilder
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+				
+		DECLARE envRef        REFERENCE TO Environment;
+		DECLARE rfh2HeaderRef REFERENCE TO Environment;
+		DECLARE exListRef     REFERENCE TO InputExceptionList;
+		
+		
+		SET OutputRoot = InputRoot;
+		
+		DECLARE MQMDRef REFERENCE TO OutputRoot.MQMD;
+		IF LASTMOVE(MQMDRef) = FALSE THEN
+			CREATE NEXTSIBLING OF OutputRoot.Properties AS MQMDRef DOMAIN('MQMD') NAME 'MQMD';
+		END IF;
+		SET     MQMDRef.Version = MQMD_CURRENT_VERSION;
+		SET     MQMDRef.ApplIdentityData = SQL.BrokerName;
+		SET     MQMDRef.CodedCharSetId = InputRoot.Properties.CodedCharSetId;
+		SET     MQMDRef.Encoding = InputRoot.Properties.Encoding;
+		
+		-- Create error data
+		CREATE NEXTSIBLING OF MQMDRef AS rfh2HeaderRef DOMAIN('MQRFH2') NAME 'MQRFH2';
+		
+		SET rfh2HeaderRef.(MQRFH2.Field) FORMAT = InputRoot.MQMD.Format;
+		SET rfh2HeaderRef.(MQRFH2.Field) CodedCharSetId = InputRoot.MQMD.CodedCharSetId;
+		SET rfh2HeaderRef.(MQRFH2.Field) Encoding = InputRoot.MQMD.Encoding;
+		
+		
+		SET  envRef.Variables.error.code 	= -999;
+		SET  envRef.Variables.error.message = 'unknown';
+		MOVE envRef TO envRef.Variables;
+		
+		CAll lastErrMsgComplete(exListRef, envRef);
+		
+		SET rfh2HeaderRef.usr.Error     = envRef.error;
+		
+		-- Prepare transfer to Log4j
+		DECLARE messageBody CHARACTER;
+		SET messageBody = 'Error on broker ' || SQL.BrokerName || '. ' || 'Code: ' || envRef.error.code || '. ' || 'Message: ' || envRef.error.message;
+						
+		-- Transfer to Log4j			
+--		CALL logError('ERR001', messageBody);
+		PROPAGATE TO TERMINAL 'out';		
+		
+		RETURN FALSE; 
+		
+	END;
+END MODULE;
