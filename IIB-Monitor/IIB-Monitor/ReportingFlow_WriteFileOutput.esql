@@ -1,0 +1,30 @@
+
+
+CREATE COMPUTE MODULE ReportingFlow_WriteFileOutput
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL CopyMessageHeaders();
+		
+		DECLARE logMsg CHAR CAST(CURRENT_TIMESTAMP AS CHAR FORMAT 'yy-MM-dd HH:mm:ss:SSS') || ' [INFO] ' 
+			|| MessageFlowLabel || ', writingMonitoringRecord, ' || Environment.Variables.ELKIndex || ', ';
+		SET OutputRoot.BLOB.BLOB =  CAST(logMsg AS BLOB CCSID 1208) || InputRoot.BLOB.BLOB;
+		
+--		CALL com.rockit.common.log.logInfo('', 'Writing the monitoring record of type: ' || Environment.Variables.ELKIndex);
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
