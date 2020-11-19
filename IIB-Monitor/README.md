@@ -4,6 +4,6 @@ The current configuration of IIB applications and IIB runtime environments is ou
 
 ## ReportingFlow.msgflow
 
-![IIB-Scheduler](https://raw.githubusercontent.com/rockitconsulting/integration-platform/master/IIB-Monitor/IIB-Monitor/docs/img/Monitor.PNG?raw=true)
+![IIB-Scheduler](https://raw.githubusercontent.com/rockitconsulting/integration-platform/master/IIB-Monitor/IIB-Monitor/docs/img/Monitoring.PNG?raw=true)
 
 This flow is executed automatically, but can be executed through a file input message or http.
